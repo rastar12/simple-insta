@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from app.db import create_db_and_tables
 from app.users import auth_backend, Fastapi_users
 from app.schemas import UserRead, UserCreate, UserUpdate
-from app.routers import posts
+from app.routers import posts, comments
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -47,6 +47,8 @@ app.include_router(
 
 # Post Routers
 app.include_router(posts.router, prefix="/posts", tags=["posts"])
+# Comment Routers
+app.include_router(comments.router, prefix="/comments", tags=["comments"])
 
 @app.get("/")
 async def root():

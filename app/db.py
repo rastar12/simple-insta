@@ -16,13 +16,27 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 Base = declarative_base()
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
+    username= Column(String, unique=True, nullable=True)
+    bio=Column(String, nullable=True)
     posts = relationship("Post", back_populates="user")
+    comments = relationship("Comment", back_populates="user")
 
 
+class Comment(Base):
+    __tablename__ = "comments"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    post_id = Column(UUID(as_uuid=True), ForeignKey("posts.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    post = relationship("Post", back_populates="comments")
+    user = relationship("User", back_populates="comments")
 
 class Post(Base):
     __tablename__ = "posts"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False)
     caption = Column(Text)
@@ -30,6 +44,7 @@ class Post(Base):
     file_type = Column(String, nullable=False)
     file_name = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    comments = relationship("Comment", back_populates="post")
 
     user = relationship("User", back_populates="posts")
 
